@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El misterio</title>
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(circle at 50% 40%, #24304a 0, #101522 35%, #070a10 75%);
+    color:#e9edf5; font-family:Georgia, "Times New Roman", serif;
+    overflow:hidden;
+  }
+  body:before{
+    content:""; position:fixed; inset:0; pointer-events:none; opacity:.18;
+    background-image:linear-gradient(#fff1 1px,transparent 1px),
+                     linear-gradient(90deg,#fff1 1px,transparent 1px);
+    background-size:42px 42px;
+  }
+  .card{
+    width:min(92%,430px); padding:42px 30px; text-align:center;
+    border:1px solid #ffffff25; border-radius:22px;
+    background:#0c111bdd; box-shadow:0 0 50px #000b, inset 0 0 30px #ffffff05;
+    backdrop-filter:blur(8px);
+  }
+  .symbol{font-size:42px; opacity:.75; margin-bottom:12px}
+  h1{font-size:28px; font-weight:normal; letter-spacing:4px; margin:0 0 10px}
+  p{color:#aeb7c9; font-size:15px; margin:0 0 28px}
+  input{
+    width:210px; padding:13px 14px; text-align:center; font-size:23px;
+    letter-spacing:8px; color:#fff; background:#080b12; border:1px solid #65708a;
+    border-radius:10px; outline:none;
+  }
+  input:focus{border-color:#b7c5df; box-shadow:0 0 18px #7e91b733}
+  button{
+    margin-top:16px; padding:11px 25px; border:1px solid #74809a;
+    border-radius:10px; background:#182033; color:#fff; cursor:pointer;
+    font-size:15px; letter-spacing:1px;
+  }
+  button:hover{background:#222d45}
+  #mensaje{min-height:30px; margin-top:25px; font-size:20px; letter-spacing:1px}
+  .error{color:#d7b4b4}
+  .success{color:#c6d9c4}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="symbol">◇</div>
+  <h1>EL MISTERIO</h1>
+  <p>Solo quien conoce la clave puede continuar.</p>
+  <input id="codigo" type="password" inputmode="numeric" maxlength="4"
+         autocomplete="off" aria-label="Código secreto">
+  <br>
+  <button id="btn">COMPROBAR</button>
+  <div id="mensaje"></div>
+</main>
+
+<script>
+const CLAVE = "053d7b9eef98fc6535d336b9448f57daf090a9335c002091bb6a8ff6d356239a";
+
+async function hash(texto) {
+  const datos = new TextEncoder().encode(texto);
+  const resultado = await crypto.subtle.digest("SHA-256", datos);
+  return [...new Uint8Array(resultado)]
+    .map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function comprobar() {
+  const campo = document.getElementById("codigo");
+  const mensaje = document.getElementById("mensaje");
+  const valor = campo.value;
+  mensaje.className = "";
+
+  if ((await hash(valor)) === CLAVE) {
+    mensaje.textContent = "Busca un snack digestivo.";
+    mensaje.className = "success";
+  } else {
+    mensaje.textContent = "Piensa al revés.";
+    mensaje.className = "error";
+  }
+}
+
+document.getElementById("btn").addEventListener("click", comprobar);
+document.getElementById("codigo").addEventListener("keydown", e => {
+  if (e.key === "Enter") comprobar();
+});
+</script>
+</body>
+</html>
